@@ -11,6 +11,7 @@ import {
 export interface DrinkFormValues {
   person: Person | null;
   photo: File | Blob | null;
+  photoTouched: boolean;
   kind: DrinkKind | "";
   name: string;
   quantityValue: string;
@@ -20,23 +21,27 @@ export interface DrinkFormValues {
 
 export function entryFieldsFromValues(
   values: DrinkFormValues,
-): Pick<
-  Entry,
-  "photo" | "kind" | "name" | "quantityValue" | "quantityUnit" | "abv"
+): Partial<
+  Pick<Entry, "photo" | "kind" | "name" | "quantityValue" | "quantityUnit" | "abv">
 > {
   const quantityNum = values.quantityValue
     ? parseFloat(values.quantityValue)
     : NaN;
   const abvNum = values.abv ? parseFloat(values.abv) : NaN;
   const hasQuantity = Number.isFinite(quantityNum);
-  return {
-    photo: values.photo ?? undefined,
+  const fields: Partial<
+    Pick<Entry, "photo" | "kind" | "name" | "quantityValue" | "quantityUnit" | "abv">
+  > = {
     kind: values.kind || undefined,
     name: values.name.trim() || undefined,
     quantityValue: hasQuantity ? quantityNum : undefined,
     quantityUnit: hasQuantity ? values.quantityUnit : undefined,
     abv: Number.isFinite(abvNum) ? abvNum : undefined,
   };
+  if (values.photoTouched) {
+    fields.photo = values.photo ?? undefined;
+  }
+  return fields;
 }
 
 interface Props {
@@ -53,6 +58,7 @@ function emptyValues(): DrinkFormValues {
   return {
     person: null,
     photo: null,
+    photoTouched: false,
     kind: "",
     name: "",
     quantityValue: "",
@@ -65,6 +71,7 @@ function valuesFromEntry(entry: Entry): DrinkFormValues {
   return {
     person: entry.person,
     photo: entry.photo ?? null,
+    photoTouched: false,
     kind: entry.kind ?? "",
     name: entry.name ?? "",
     quantityValue: entry.quantityValue != null ? String(entry.quantityValue) : "",
@@ -162,7 +169,7 @@ export function DrinkForm({
             className="photo-clear"
             aria-label="Remove photo"
             onClick={() => {
-              patch({ photo: null });
+              patch({ photo: null, photoTouched: true });
               if (fileInputRef.current) fileInputRef.current.value = "";
             }}
           >
@@ -176,7 +183,7 @@ export function DrinkForm({
           capture="environment"
           style={{ display: "none" }}
           onChange={(e) =>
-            patch({ photo: e.target.files?.[0] ?? null })
+            patch({ photo: e.target.files?.[0] ?? null, photoTouched: true })
           }
         />
       </div>
