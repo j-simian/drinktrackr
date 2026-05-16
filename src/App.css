@@ -190,6 +190,46 @@ select:focus {
   cursor: not-allowed;
 }
 
+.form-actions {
+  margin-top: 4px;
+  display: flex;
+  gap: 8px;
+}
+
+.form-actions .save-btn {
+  flex: 1;
+  margin-top: 0;
+}
+
+.cancel-btn {
+  min-height: 52px;
+  padding: 0 18px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.photo-clear {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  font-size: 1.2rem;
+  line-height: 1;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.photo-clear:hover {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
 .save-error {
   color: var(--danger);
   font-size: 0.9rem;
@@ -271,20 +311,86 @@ select:focus {
   white-space: nowrap;
 }
 
+.entry-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.entry-edit,
 .entry-delete {
   background: transparent;
   color: var(--muted);
   border: 0;
-  font-size: 1.4rem;
   line-height: 1;
   width: 36px;
   height: 36px;
   border-radius: 8px;
   cursor: pointer;
-  flex-shrink: 0;
+}
+
+.entry-edit {
+  font-size: 1.05rem;
+}
+
+.entry-delete {
+  font-size: 1.4rem;
+}
+
+.entry-edit:hover {
+  color: var(--accent);
+  background: var(--surface-2);
 }
 
 .entry-delete:hover {
   color: var(--danger);
+  background: var(--surface-2);
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px 16px;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+.modal {
+  width: 100%;
+  max-width: 520px;
+  margin: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.modal-close {
+  background: transparent;
+  color: var(--muted);
+  border: 0;
+  font-size: 1.6rem;
+  line-height: 1;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.modal-close:hover {
+  color: var(--text);
   background: var(--surface-2);
 }

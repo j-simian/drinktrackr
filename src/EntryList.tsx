@@ -1,5 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { deleteEntry, getEntries } from "./db";
+import { deleteEntry, getEntries, saveEntry } from "./db";
+import {
+  DrinkForm,
+  entryFieldsFromValues,
+  type DrinkFormValues,
+} from "./DrinkForm";
 import type { Entry } from "./types";
 
 interface Props {
@@ -34,6 +39,7 @@ function describeDrink(entry: Entry): string {
 
 export function EntryList({ refreshKey, onChange }: Props) {
   const [entries, setEntries] = useState<Entry[]>([]);
+  const [editing, setEditing] = useState<Entry | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -65,50 +71,101 @@ export function EntryList({ refreshKey, onChange }: Props) {
     onChange();
   }
 
-  if (entries.length === 0) {
-    return (
-      <section className="entries-section">
-        <h2>Recent</h2>
-        <p className="empty">No bevs logged yet.</p>
-      </section>
-    );
+  async function handleEditSubmit(values: DrinkFormValues) {
+    if (!editing || !values.person) return;
+    await saveEntry({
+      ...editing,
+      person: values.person,
+      ...entryFieldsFromValues(values),
+    });
+    setEditing(null);
+    onChange();
   }
 
   return (
-    <section className="entries-section">
-      <h2>Recent</h2>
-      <ul className="entries">
-        {entries.map((entry) => (
-          <li key={entry.id} className="entry">
-            {photoUrls.get(entry.id) ? (
-              <img
-                src={photoUrls.get(entry.id)}
-                alt=""
-                className="entry-thumb"
-              />
-            ) : (
-              <div className="entry-thumb placeholder" aria-hidden="true" />
-            )}
-            <div className="entry-body">
-              <div className="entry-top">
-                <strong>{entry.person}</strong>
-                <span className="entry-time">
-                  {formatRelative(entry.timestamp)}
-                </span>
-              </div>
-              <div className="entry-desc">{describeDrink(entry)}</div>
+    <>
+      <section className="entries-section">
+        <h2>Recent</h2>
+        {entries.length === 0 ? (
+          <p className="empty">No bevs logged yet.</p>
+        ) : (
+          <ul className="entries">
+            {entries.map((entry) => (
+              <li key={entry.id} className="entry">
+                {photoUrls.get(entry.id) ? (
+                  <img
+                    src={photoUrls.get(entry.id)}
+                    alt=""
+                    className="entry-thumb"
+                  />
+                ) : (
+                  <div className="entry-thumb placeholder" aria-hidden="true" />
+                )}
+                <div className="entry-body">
+                  <div className="entry-top">
+                    <strong>{entry.person}</strong>
+                    <span className="entry-time">
+                      {formatRelative(entry.timestamp)}
+                    </span>
+                  </div>
+                  <div className="entry-desc">{describeDrink(entry)}</div>
+                </div>
+                <div className="entry-actions">
+                  <button
+                    type="button"
+                    className="entry-edit"
+                    aria-label="Edit entry"
+                    onClick={() => setEditing(entry)}
+                  >
+                    ✎
+                  </button>
+                  <button
+                    type="button"
+                    className="entry-delete"
+                    aria-label="Delete entry"
+                    onClick={() => handleDelete(entry.id)}
+                  >
+                    ×
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      {editing && (
+        <div
+          className="modal-backdrop"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Edit entry"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setEditing(null);
+          }}
+        >
+          <div className="modal card">
+            <div className="modal-header">
+              <h3>Edit entry</h3>
+              <button
+                type="button"
+                className="modal-close"
+                aria-label="Close"
+                onClick={() => setEditing(null)}
+              >
+                ×
+              </button>
             </div>
-            <button
-              type="button"
-              className="entry-delete"
-              aria-label="Delete entry"
-              onClick={() => handleDelete(entry.id)}
-            >
-              ×
-            </button>
-          </li>
-        ))}
-      </ul>
-    </section>
+            <DrinkForm
+              key={editing.id}
+              initial={editing}
+              submitLabel="Save changes"
+              onSubmit={handleEditSubmit}
+              onCancel={() => setEditing(null)}
+            />
+          </div>
+        </div>
+      )}
+    </>
   );
 }
