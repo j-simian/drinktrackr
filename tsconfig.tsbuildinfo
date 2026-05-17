@@ -1,1 +1,1 @@
-{"root":["./src/App.tsx","./src/DrinkForm.tsx","./src/EntryList.tsx","./src/db.ts","./src/main.tsx","./src/types.ts"],"version":"5.9.3"}
+{"root":["./src/App.tsx","./src/BeerCounter.tsx","./src/DrinkForm.tsx","./src/EntryList.tsx","./src/db.ts","./src/main.tsx","./src/types.ts"],"version":"5.9.3"}
