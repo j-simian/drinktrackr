@@ -6,6 +6,7 @@ import {
 } from "./DrinkForm";
 import { randomId, saveEntry } from "./db";
 import { EntryList } from "./EntryList";
+import { BeerCounter } from "./BeerCounter";
 
 export function App() {
   const [refreshCount, setRefreshCount] = useState(0);
@@ -26,6 +27,8 @@ export function App() {
       <header>
         <h1>Bev Log</h1>
       </header>
+
+      <BeerCounter refreshKey={refreshCount} />
 
       <section className="card">
         <DrinkForm
