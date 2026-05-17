@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getEntries } from "./db";
+import { totalBeers } from "./beerCount";
 
 interface Props {
   refreshKey: number;
@@ -14,7 +15,7 @@ export function BeerCounter({ refreshKey }: Props) {
     let cancelled = false;
     getEntries().then((list) => {
       if (cancelled) return;
-      setCount(list.filter((e) => e.kind === "beer").length);
+      setCount(totalBeers(list));
     });
     return () => {
       cancelled = true;
