@@ -3,6 +3,7 @@ import { deleteEntry, getEntries, saveEntry } from "./db";
 import {
   DrinkForm,
   entryFieldsFromValues,
+  timestampFromValues,
   type DrinkFormValues,
 } from "./DrinkForm";
 import type { Entry } from "./types";
@@ -73,9 +74,11 @@ export function EntryList({ refreshKey, onChange }: Props) {
 
   async function handleEditSubmit(values: DrinkFormValues) {
     if (!editing || !values.person) return;
+    const ts = timestampFromValues(values);
     await saveEntry({
       ...editing,
       person: values.person,
+      timestamp: ts ?? editing.timestamp,
       ...entryFieldsFromValues(values),
     });
     setEditing(null);
