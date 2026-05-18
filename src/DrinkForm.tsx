@@ -17,6 +17,34 @@ export interface DrinkFormValues {
   quantityValue: string;
   quantityUnit: QuantityUnit;
   abv: string;
+  date: string;
+  time: string;
+}
+
+function pad2(n: number): string {
+  return n.toString().padStart(2, "0");
+}
+
+function dateInputFromTimestamp(ts: number): string {
+  const d = new Date(ts);
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+}
+
+function timeInputFromTimestamp(ts: number): string {
+  const d = new Date(ts);
+  return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+}
+
+export function timestampFromValues(values: DrinkFormValues): number | null {
+  if (!values.date || !values.time) return null;
+  const [year, month, day] = values.date.split("-").map(Number);
+  const [hour, minute] = values.time.split(":").map(Number);
+  if ([year, month, day, hour, minute].some((n) => !Number.isFinite(n))) {
+    return null;
+  }
+  const d = new Date(year, month - 1, day, hour, minute, 0, 0);
+  const ts = d.getTime();
+  return Number.isFinite(ts) ? ts : null;
 }
 
 export function entryFieldsFromValues(
@@ -55,6 +83,7 @@ interface Props {
 }
 
 function emptyValues(): DrinkFormValues {
+  const now = Date.now();
   return {
     person: null,
     photo: null,
@@ -64,6 +93,8 @@ function emptyValues(): DrinkFormValues {
     quantityValue: "",
     quantityUnit: "pint",
     abv: "",
+    date: dateInputFromTimestamp(now),
+    time: timeInputFromTimestamp(now),
   };
 }
 
@@ -77,6 +108,8 @@ function valuesFromEntry(entry: Entry): DrinkFormValues {
     quantityValue: entry.quantityValue != null ? String(entry.quantityValue) : "",
     quantityUnit: entry.quantityUnit ?? "pint",
     abv: entry.abv != null ? String(entry.abv) : "",
+    date: dateInputFromTimestamp(entry.timestamp),
+    time: timeInputFromTimestamp(entry.timestamp),
   };
 }
 
@@ -257,6 +290,26 @@ export function DrinkForm({
         onChange={(e) => patch({ abv: e.target.value })}
         placeholder="e.g. 4.2"
       />
+
+      {initial && (
+        <>
+          <label className="field-label">When</label>
+          <div className="datetime-row">
+            <input
+              type="date"
+              aria-label="Date"
+              value={values.date}
+              onChange={(e) => patch({ date: e.target.value })}
+            />
+            <input
+              type="time"
+              aria-label="Time"
+              value={values.time}
+              onChange={(e) => patch({ time: e.target.value })}
+            />
+          </div>
+        </>
+      )}
 
       <div className="form-actions">
         {onCancel && (

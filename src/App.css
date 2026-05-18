@@ -177,6 +177,8 @@ header h1 {
 
 input[type="text"],
 input[type="number"],
+input[type="date"],
+input[type="time"],
 select {
   min-height: 48px;
   border-radius: 10px;
@@ -211,6 +213,15 @@ select:focus {
 }
 
 .quantity-row input {
+  flex: 1;
+}
+
+.datetime-row {
+  display: flex;
+  gap: 8px;
+}
+
+.datetime-row input {
   flex: 1;
 }
 
