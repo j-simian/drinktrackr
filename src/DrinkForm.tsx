@@ -9,7 +9,7 @@ import {
 } from "./types";
 
 export interface DrinkFormValues {
-  person: Person | null;
+  people: Person[];
   photo: File | Blob | null;
   photoTouched: boolean;
   kind: DrinkKind | "";
@@ -80,12 +80,13 @@ interface Props {
   onSubmit: (values: DrinkFormValues) => Promise<void>;
   onCancel?: () => void;
   resetOnSubmit?: boolean;
+  multiSelectPeople?: boolean;
 }
 
 function emptyValues(): DrinkFormValues {
   const now = Date.now();
   return {
-    person: null,
+    people: [],
     photo: null,
     photoTouched: false,
     kind: "",
@@ -100,7 +101,7 @@ function emptyValues(): DrinkFormValues {
 
 function valuesFromEntry(entry: Entry): DrinkFormValues {
   return {
-    person: entry.person,
+    people: [entry.person],
     photo: entry.photo ?? null,
     photoTouched: false,
     kind: entry.kind ?? "",
@@ -121,6 +122,7 @@ export function DrinkForm({
   onSubmit,
   onCancel,
   resetOnSubmit = false,
+  multiSelectPeople = false,
 }: Props) {
   const [values, setValues] = useState<DrinkFormValues>(
     initial ? valuesFromEntry(initial) : emptyValues(),
@@ -145,8 +147,21 @@ export function DrinkForm({
     setValues((v) => ({ ...v, ...partial }));
   }
 
+  function togglePerson(p: Person) {
+    setValues((v) => {
+      if (multiSelectPeople) {
+        const has = v.people.includes(p);
+        return {
+          ...v,
+          people: has ? v.people.filter((x) => x !== p) : [...v.people, p],
+        };
+      }
+      return { ...v, people: [p] };
+    });
+  }
+
   async function handleSubmit() {
-    if (!values.person || saving) return;
+    if (values.people.length === 0 || saving) return;
     setSaving(true);
     setError(null);
     try {
@@ -169,19 +184,24 @@ export function DrinkForm({
 
   return (
     <>
-      <label className="field-label">Who</label>
+      <label className="field-label">
+        Who{multiSelectPeople ? " (tap multiple for a round)" : ""}
+      </label>
       <div className="people">
-        {PEOPLE.map((p) => (
-          <button
-            key={p}
-            type="button"
-            className={`person-btn ${values.person === p ? "selected" : ""}`}
-            aria-pressed={values.person === p}
-            onClick={() => patch({ person: p })}
-          >
-            {p}
-          </button>
-        ))}
+        {PEOPLE.map((p) => {
+          const selected = values.people.includes(p);
+          return (
+            <button
+              key={p}
+              type="button"
+              className={`person-btn ${selected ? "selected" : ""}`}
+              aria-pressed={selected}
+              onClick={() => togglePerson(p)}
+            >
+              {p}
+            </button>
+          );
+        })}
       </div>
 
       <label className="field-label">Photo</label>
@@ -320,14 +340,16 @@ export function DrinkForm({
         <button
           type="button"
           className="save-btn"
-          disabled={!values.person || saving}
+          disabled={values.people.length === 0 || saving}
           onClick={handleSubmit}
         >
           {justSaved && savedLabel
             ? savedLabel
             : saving
               ? savingLabel
-              : submitLabel}
+              : multiSelectPeople && values.people.length > 1
+                ? `${submitLabel} ×${values.people.length}`
+                : submitLabel}
         </button>
       </div>
       {error && <p className="save-error">Save failed: {error}</p>}

@@ -12,13 +12,17 @@ export function App() {
   const [refreshCount, setRefreshCount] = useState(0);
 
   async function handleCreate(values: DrinkFormValues) {
-    if (!values.person) return;
-    await saveEntry({
-      id: randomId(),
-      person: values.person,
-      timestamp: Date.now(),
-      ...entryFieldsFromValues(values),
-    });
+    if (values.people.length === 0) return;
+    const timestamp = Date.now();
+    const fields = entryFieldsFromValues(values);
+    for (const person of values.people) {
+      await saveEntry({
+        id: randomId(),
+        person,
+        timestamp,
+        ...fields,
+      });
+    }
     setRefreshCount((c) => c + 1);
   }
 
@@ -36,6 +40,7 @@ export function App() {
           savedLabel="Saved ✓"
           onSubmit={handleCreate}
           resetOnSubmit
+          multiSelectPeople
         />
       </section>
 
