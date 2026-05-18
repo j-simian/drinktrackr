@@ -63,6 +63,17 @@ header h1 {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  width: 100%;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.beer-counter:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .beer-counter-row {
@@ -445,4 +456,41 @@ select:focus {
 .modal-close:hover {
   color: var(--text);
   background: var(--surface-2);
+}
+
+.stats-section + .stats-section {
+  margin-top: 12px;
+}
+
+.stats-heading {
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 8px;
+  font-weight: 500;
+}
+
+.stats-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stats-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  background: var(--surface-2);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 0.95rem;
+}
+
+.stats-row strong {
+  color: var(--accent);
+  font-size: 1.05rem;
 }
