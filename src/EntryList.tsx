@@ -73,11 +73,12 @@ export function EntryList({ refreshKey, onChange }: Props) {
   }
 
   async function handleEditSubmit(values: DrinkFormValues) {
-    if (!editing || !values.person) return;
+    const person = values.people[0];
+    if (!editing || !person) return;
     const ts = timestampFromValues(values);
     await saveEntry({
       ...editing,
-      person: values.person,
+      person,
       timestamp: ts ?? editing.timestamp,
       ...entryFieldsFromValues(values),
     });
