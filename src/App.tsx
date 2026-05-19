@@ -4,9 +4,10 @@ import {
   entryFieldsFromValues,
   type DrinkFormValues,
 } from "./DrinkForm";
-import { randomId, saveEntry } from "./db";
+import { getEntries, randomId, saveEntry } from "./db";
 import { EntryList } from "./EntryList";
 import { BeerCounter } from "./BeerCounter";
+import { downloadCsv } from "./csvExport";
 
 export function App() {
   const [refreshCount, setRefreshCount] = useState(0);
@@ -26,10 +27,27 @@ export function App() {
     setRefreshCount((c) => c + 1);
   }
 
+  async function handleExport() {
+    const entries = await getEntries();
+    if (entries.length === 0) {
+      alert("No entries to export.");
+      return;
+    }
+    downloadCsv(entries);
+  }
+
   return (
     <div className="app">
       <header>
         <h1>Bev Log</h1>
+        <button
+          type="button"
+          className="export-btn"
+          onClick={handleExport}
+          aria-label="Export entries as CSV"
+        >
+          Export CSV
+        </button>
       </header>
 
       <BeerCounter refreshKey={refreshCount} />
