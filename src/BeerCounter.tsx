@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getEntries } from "./db";
 import { totalBeers } from "./beerCount";
-import { BeerStatsModal } from "./BeerStatsModal";
+import { StatsPage } from "./StatsPage";
 import type { Entry } from "./types";
 
 interface Props {
@@ -48,10 +48,7 @@ export function BeerCounter({ refreshKey }: Props) {
         </div>
       </button>
       {showStats && (
-        <BeerStatsModal
-          entries={entries}
-          onClose={() => setShowStats(false)}
-        />
+        <StatsPage entries={entries} onClose={() => setShowStats(false)} />
       )}
     </>
   );
