@@ -8,6 +8,7 @@ import { getEntries, randomId, saveEntry } from "./db";
 import { EntryList } from "./EntryList";
 import { BeerCounter } from "./BeerCounter";
 import { downloadCsv } from "./csvExport";
+import { downloadPhotos } from "./photoExport";
 
 export function App() {
   const [refreshCount, setRefreshCount] = useState(0);
@@ -36,18 +37,34 @@ export function App() {
     downloadCsv(entries);
   }
 
+  async function handleExportPhotos() {
+    const entries = await getEntries();
+    const ok = await downloadPhotos(entries);
+    if (!ok) alert("No photos to export.");
+  }
+
   return (
     <div className="app">
       <header>
         <h1>Bev Log</h1>
-        <button
-          type="button"
-          className="export-btn"
-          onClick={handleExport}
-          aria-label="Export entries as CSV"
-        >
-          Export CSV
-        </button>
+        <div className="export-actions">
+          <button
+            type="button"
+            className="export-btn"
+            onClick={handleExport}
+            aria-label="Export entries as CSV"
+          >
+            Export CSV
+          </button>
+          <button
+            type="button"
+            className="export-btn"
+            onClick={handleExportPhotos}
+            aria-label="Export photos as ZIP"
+          >
+            Export Photos
+          </button>
+        </div>
       </header>
 
       <BeerCounter refreshKey={refreshCount} />
