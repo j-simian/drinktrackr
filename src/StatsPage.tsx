@@ -38,6 +38,9 @@ const PERSON_COLOR: Record<Person, string> = {
   Chaz: "#10b981",
   Kash: "#f97316",
   Jess: "#a78bfa",
+  Tess: "#ec4899",
+  Emma: "#06b6d4",
+  Niamh: "#84cc16",
 };
 
 type Filter = "Everyone" | Person;
