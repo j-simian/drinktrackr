@@ -11,7 +11,7 @@ import type { Entry } from "./types";
 function entry(overrides: Partial<Entry> = {}): Entry {
   return {
     id: "id",
-    person: "Addi",
+    person: "Naman",
     timestamp: 0,
     kind: "beer",
     ...overrides,
@@ -113,10 +113,10 @@ describe("beersByPerson", () => {
 
   it("sums beers per person and omits people with no beers", () => {
     const entries: Entry[] = [
-      entry({ id: "1", person: "Addi" }),
+      entry({ id: "1", person: "Naman" }),
       entry({
         id: "2",
-        person: "Addi",
+        person: "Naman",
         quantityValue: 1000,
         quantityUnit: "ml",
       }),
@@ -124,16 +124,16 @@ describe("beersByPerson", () => {
       entry({ id: "4", person: "Jess", kind: "wine" }),
       entry({
         id: "5",
-        person: "Jonny",
+        person: "Ross",
         quantityValue: 50,
         quantityUnit: "ml",
       }),
     ];
     const result = beersByPerson(entries);
-    expect(result.get("Addi")).toBe(3);
+    expect(result.get("Naman")).toBe(3);
     expect(result.get("Jess")).toBe(1);
-    expect(result.has("Jonny")).toBe(false);
-    expect(result.has("Matt")).toBe(false);
+    expect(result.has("Ross")).toBe(false);
+    expect(result.has("Chaz")).toBe(false);
   });
 });
 

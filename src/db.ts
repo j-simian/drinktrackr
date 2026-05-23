@@ -1,5 +1,7 @@
-import { openDB, type DBSchema, type IDBPDatabase } from "idb";
+import { deleteDB, openDB, type DBSchema, type IDBPDatabase } from "idb";
 import type { Entry } from "./types";
+
+const DB_NAME = "bevlog";
 
 interface BevLogDB extends DBSchema {
   entries: {
@@ -13,7 +15,7 @@ let dbPromise: Promise<IDBPDatabase<BevLogDB>> | null = null;
 
 function getDb() {
   if (!dbPromise) {
-    dbPromise = openDB<BevLogDB>("bevlog", 1, {
+    dbPromise = openDB<BevLogDB>(DB_NAME, 1, {
       upgrade(db) {
         const store = db.createObjectStore("entries", { keyPath: "id" });
         store.createIndex("by-timestamp", "timestamp");
@@ -21,6 +23,25 @@ function getDb() {
     });
   }
   return dbPromise;
+}
+
+export async function clearAllData(): Promise<void> {
+  if (dbPromise) {
+    const db = await dbPromise;
+    db.close();
+    dbPromise = null;
+  }
+  await deleteDB(DB_NAME);
+  try {
+    localStorage.clear();
+  } catch {
+    // localStorage may be unavailable (private mode, etc.) — ignore.
+  }
+  try {
+    sessionStorage.clear();
+  } catch {
+    // ignore
+  }
 }
 
 export async function saveEntry(entry: Entry): Promise<void> {

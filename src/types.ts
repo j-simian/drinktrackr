@@ -1,4 +1,11 @@
-export const PEOPLE = ["Addi", "Jess", "Jonny", "Josh", "Matt"] as const;
+export const PEOPLE = [
+  "Naman",
+  "Ross",
+  "Duncan",
+  "Chaz",
+  "Kash",
+  "Jess",
+] as const;
 export type Person = (typeof PEOPLE)[number];
 
 export const DRINK_KINDS = ["beer", "wine", "spirit", "other"] as const;
