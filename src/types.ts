@@ -5,6 +5,9 @@ export const PEOPLE = [
   "Chaz",
   "Kash",
   "Jess",
+  "Tess",
+  "Emma",
+  "Niamh",
 ] as const;
 export type Person = (typeof PEOPLE)[number];
 

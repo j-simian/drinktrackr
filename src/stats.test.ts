@@ -222,7 +222,10 @@ describe("daysWithAllFive", () => {
       entry({ id: "4", person: "Duncan", timestamp: day1 }),
       entry({ id: "5", person: "Chaz", timestamp: day1 }),
       entry({ id: "6", person: "Kash", timestamp: day1 }),
-      entry({ id: "7", person: "Naman", timestamp: day2 }),
+      entry({ id: "7", person: "Tess", timestamp: day1 }),
+      entry({ id: "8", person: "Emma", timestamp: day1 }),
+      entry({ id: "9", person: "Niamh", timestamp: day1 }),
+      entry({ id: "10", person: "Naman", timestamp: day2 }),
     ];
     expect(daysWithAllFive(entries)).toEqual(["2026-05-18"]);
   });
@@ -238,6 +241,9 @@ describe("roundOfFive", () => {
       entry({ id: "4", person: "Duncan", name: "Pilsner Urquell", timestamp: t0 + 180_000 }),
       entry({ id: "5", person: "Chaz", name: "Pilsner Urquell", timestamp: t0 + 240_000 }),
       entry({ id: "6", person: "Kash", name: "Pilsner Urquell", timestamp: t0 + 300_000 }),
+      entry({ id: "7", person: "Tess", name: "Pilsner Urquell", timestamp: t0 + 360_000 }),
+      entry({ id: "8", person: "Emma", name: "Pilsner Urquell", timestamp: t0 + 420_000 }),
+      entry({ id: "9", person: "Niamh", name: "Pilsner Urquell", timestamp: t0 + 480_000 }),
     ];
     expect(roundOfFive(entries, 10 * 60 * 1000)).toBe(true);
   });

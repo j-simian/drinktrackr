@@ -94,6 +94,9 @@ describe("group: squad-goals", () => {
       entry({ id: "4", person: "Duncan", timestamp: t }),
       entry({ id: "5", person: "Chaz", timestamp: t }),
       entry({ id: "6", person: "Kash", timestamp: t }),
+      entry({ id: "7", person: "Tess", timestamp: t }),
+      entry({ id: "8", person: "Emma", timestamp: t }),
+      entry({ id: "9", person: "Niamh", timestamp: t }),
     ];
     const result = ach.evaluate(entries);
     expect(result.unlocked).toBe(true);
