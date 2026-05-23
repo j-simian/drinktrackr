@@ -272,7 +272,7 @@ const GROUP: GroupAchievement[] = [
     id: "squad-goals",
     emoji: "🥂",
     label: "Squad Goals",
-    description: "All five logged a drink on the same day.",
+    description: "Everyone logged a drink on the same day.",
     evaluate(entries) {
       const days = daysWithAllFive(entries);
       return {

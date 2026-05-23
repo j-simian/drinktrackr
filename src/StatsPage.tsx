@@ -32,11 +32,12 @@ interface Props {
 }
 
 const PERSON_COLOR: Record<Person, string> = {
-  Addi: "#3b82f6",
-  Jess: "#e5484d",
-  Jonny: "#f5a524",
-  Josh: "#10b981",
-  Matt: "#f97316",
+  Naman: "#3b82f6",
+  Ross: "#e5484d",
+  Duncan: "#f5a524",
+  Chaz: "#10b981",
+  Kash: "#f97316",
+  Jess: "#a78bfa",
 };
 
 type Filter = "Everyone" | Person;

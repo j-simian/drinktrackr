@@ -77,6 +77,15 @@ header h1 {
   color: var(--accent);
 }
 
+.reset-btn {
+  color: var(--danger);
+}
+
+.reset-btn:hover {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
 .card {
   background: var(--surface);
   border-radius: 16px;

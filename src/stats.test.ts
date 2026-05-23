@@ -21,7 +21,7 @@ import {
 function entry(overrides: Partial<Entry> = {}): Entry {
   return {
     id: "id",
-    person: "Addi",
+    person: "Naman",
     timestamp: new Date(2026, 4, 18, 12, 0, 0).getTime(),
     kind: "beer",
     quantityValue: 500,
@@ -137,7 +137,7 @@ describe("longestStreak", () => {
 
 describe("mostInRollingWindow", () => {
   it("returns 0 when person has no entries", () => {
-    expect(mostInRollingWindow([], "Addi", 60 * 60 * 1000)).toEqual({
+    expect(mostInRollingWindow([], "Naman", 60 * 60 * 1000)).toEqual({
       count: 0,
       startTs: null,
     });
@@ -197,45 +197,47 @@ describe("uniqueDrinkNames / uniqueSpiritNames", () => {
 describe("dailyHistory", () => {
   it("groups entries per day with per-person counts", () => {
     const entries: Entry[] = [
-      entry({ id: "1", person: "Addi", timestamp: new Date(2026, 4, 18, 12).getTime() }),
+      entry({ id: "1", person: "Naman", timestamp: new Date(2026, 4, 18, 12).getTime() }),
       entry({ id: "2", person: "Jess", timestamp: new Date(2026, 4, 18, 13).getTime() }),
-      entry({ id: "3", person: "Addi", timestamp: new Date(2026, 4, 19, 14).getTime() }),
+      entry({ id: "3", person: "Naman", timestamp: new Date(2026, 4, 19, 14).getTime() }),
     ];
     const rows = dailyHistory(entries);
     expect(rows).toHaveLength(2);
     expect(rows[0].key).toBe("2026-05-18");
     expect(rows[0].total).toBe(2);
-    expect(rows[0].byPerson.Addi).toBe(1);
+    expect(rows[0].byPerson.Naman).toBe(1);
     expect(rows[0].byPerson.Jess).toBe(1);
-    expect(rows[1].byPerson.Addi).toBe(1);
+    expect(rows[1].byPerson.Naman).toBe(1);
   });
 });
 
 describe("daysWithAllFive", () => {
-  it("returns days where all five people logged a drink", () => {
+  it("returns days where every person logged a drink", () => {
     const day1 = new Date(2026, 4, 18, 12).getTime();
     const day2 = new Date(2026, 4, 19, 12).getTime();
     const entries: Entry[] = [
-      entry({ id: "1", person: "Addi", timestamp: day1 }),
+      entry({ id: "1", person: "Naman", timestamp: day1 }),
       entry({ id: "2", person: "Jess", timestamp: day1 }),
-      entry({ id: "3", person: "Jonny", timestamp: day1 }),
-      entry({ id: "4", person: "Josh", timestamp: day1 }),
-      entry({ id: "5", person: "Matt", timestamp: day1 }),
-      entry({ id: "6", person: "Addi", timestamp: day2 }),
+      entry({ id: "3", person: "Ross", timestamp: day1 }),
+      entry({ id: "4", person: "Duncan", timestamp: day1 }),
+      entry({ id: "5", person: "Chaz", timestamp: day1 }),
+      entry({ id: "6", person: "Kash", timestamp: day1 }),
+      entry({ id: "7", person: "Naman", timestamp: day2 }),
     ];
     expect(daysWithAllFive(entries)).toEqual(["2026-05-18"]);
   });
 });
 
 describe("roundOfFive", () => {
-  it("detects 5 people drinking the same drink within the window", () => {
+  it("detects everyone drinking the same drink within the window", () => {
     const t0 = new Date(2026, 4, 18, 20, 0).getTime();
     const entries: Entry[] = [
-      entry({ id: "1", person: "Addi", name: "Pilsner Urquell", timestamp: t0 }),
+      entry({ id: "1", person: "Naman", name: "Pilsner Urquell", timestamp: t0 }),
       entry({ id: "2", person: "Jess", name: "Pilsner Urquell", timestamp: t0 + 60_000 }),
-      entry({ id: "3", person: "Jonny", name: "Pilsner Urquell", timestamp: t0 + 120_000 }),
-      entry({ id: "4", person: "Josh", name: "Pilsner Urquell", timestamp: t0 + 180_000 }),
-      entry({ id: "5", person: "Matt", name: "Pilsner Urquell", timestamp: t0 + 240_000 }),
+      entry({ id: "3", person: "Ross", name: "Pilsner Urquell", timestamp: t0 + 120_000 }),
+      entry({ id: "4", person: "Duncan", name: "Pilsner Urquell", timestamp: t0 + 180_000 }),
+      entry({ id: "5", person: "Chaz", name: "Pilsner Urquell", timestamp: t0 + 240_000 }),
+      entry({ id: "6", person: "Kash", name: "Pilsner Urquell", timestamp: t0 + 300_000 }),
     ];
     expect(roundOfFive(entries, 10 * 60 * 1000)).toBe(true);
   });
@@ -243,19 +245,20 @@ describe("roundOfFive", () => {
   it("returns false when window is too short", () => {
     const t0 = new Date(2026, 4, 18, 20, 0).getTime();
     const entries: Entry[] = [
-      entry({ id: "1", person: "Addi", name: "Beer", timestamp: t0 }),
+      entry({ id: "1", person: "Naman", name: "Beer", timestamp: t0 }),
       entry({ id: "2", person: "Jess", name: "Beer", timestamp: t0 + 60_000 }),
-      entry({ id: "3", person: "Jonny", name: "Beer", timestamp: t0 + 20 * 60_000 }),
-      entry({ id: "4", person: "Josh", name: "Beer", timestamp: t0 + 30 * 60_000 }),
-      entry({ id: "5", person: "Matt", name: "Beer", timestamp: t0 + 40 * 60_000 }),
+      entry({ id: "3", person: "Ross", name: "Beer", timestamp: t0 + 15 * 60_000 }),
+      entry({ id: "4", person: "Duncan", name: "Beer", timestamp: t0 + 25 * 60_000 }),
+      entry({ id: "5", person: "Chaz", name: "Beer", timestamp: t0 + 35 * 60_000 }),
+      entry({ id: "6", person: "Kash", name: "Beer", timestamp: t0 + 45 * 60_000 }),
     ];
     expect(roundOfFive(entries, 10 * 60 * 1000)).toBe(false);
   });
 
-  it("returns false for fewer than five people", () => {
+  it("returns false when not everyone joined the round", () => {
     const t0 = new Date(2026, 4, 18, 20, 0).getTime();
     const entries: Entry[] = [
-      entry({ id: "1", person: "Addi", name: "Beer", timestamp: t0 }),
+      entry({ id: "1", person: "Naman", name: "Beer", timestamp: t0 }),
       entry({ id: "2", person: "Jess", name: "Beer", timestamp: t0 + 60_000 }),
     ];
     expect(roundOfFive(entries, 10 * 60 * 1000)).toBe(false);
@@ -267,18 +270,18 @@ describe("biggestDay", () => {
     const t1 = new Date(2026, 4, 18, 12).getTime();
     const t2 = new Date(2026, 4, 19, 12).getTime();
     const entries: Entry[] = [
-      entry({ id: "1", person: "Addi", timestamp: t1 }),
-      entry({ id: "2", person: "Addi", timestamp: t1 + 3600_000 }),
-      entry({ id: "3", person: "Addi", timestamp: t2 }),
+      entry({ id: "1", person: "Naman", timestamp: t1 }),
+      entry({ id: "2", person: "Naman", timestamp: t1 + 3600_000 }),
+      entry({ id: "3", person: "Naman", timestamp: t2 }),
     ];
-    expect(biggestDay(entries, "Addi")).toEqual({
+    expect(biggestDay(entries, "Naman")).toEqual({
       key: "2026-05-18",
       count: 2,
     });
   });
 
   it("returns null with no entries", () => {
-    expect(biggestDay([], "Addi")).toBeNull();
+    expect(biggestDay([], "Naman")).toBeNull();
   });
 });
 

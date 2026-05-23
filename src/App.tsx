@@ -4,7 +4,7 @@ import {
   entryFieldsFromValues,
   type DrinkFormValues,
 } from "./DrinkForm";
-import { getEntries, randomId, saveEntry } from "./db";
+import { clearAllData, getEntries, randomId, saveEntry } from "./db";
 import { EntryList } from "./EntryList";
 import { BeerCounter } from "./BeerCounter";
 import { downloadCsv } from "./csvExport";
@@ -43,6 +43,15 @@ export function App() {
     if (!ok) alert("No photos to export.");
   }
 
+  async function handleReset() {
+    const ok = window.confirm(
+      "Reset all data?\n\nThis will permanently delete every logged drink and clear local storage. This can't be undone.",
+    );
+    if (!ok) return;
+    await clearAllData();
+    window.location.reload();
+  }
+
   return (
     <div className="app">
       <header>
@@ -63,6 +72,14 @@ export function App() {
             aria-label="Export photos as ZIP"
           >
             Export Photos
+          </button>
+          <button
+            type="button"
+            className="export-btn reset-btn"
+            onClick={handleReset}
+            aria-label="Reset all data"
+          >
+            Reset
           </button>
         </div>
       </header>
