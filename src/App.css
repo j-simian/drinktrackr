@@ -191,6 +191,82 @@ header h1 {
   border-color: var(--accent);
 }
 
+.person-slot {
+  position: relative;
+  display: flex;
+}
+
+.person-slot .person-btn {
+  flex: 1;
+  width: 100%;
+}
+
+.person-remove {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--danger);
+  color: #fff;
+  font-size: 0.9rem;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.people-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.edit-names-btn {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 0.8rem;
+  padding: 2px 0;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.edit-names-btn[aria-pressed="true"] {
+  color: var(--accent);
+}
+
+.add-person-row {
+  display: flex;
+  gap: 8px;
+}
+
+.add-person-row input {
+  flex: 1;
+}
+
+.add-person-btn {
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 10px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--accent-text);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.add-person-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .photo-row {
   display: flex;
   gap: 12px;

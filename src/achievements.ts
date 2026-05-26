@@ -1,5 +1,5 @@
 import type { Entry, Person } from "./types";
-import { PEOPLE } from "./types";
+import { getPeople } from "./people";
 import { beersForEntry, drinkDayKey } from "./beerCount";
 import {
   countByKind,
@@ -74,7 +74,7 @@ function rank(
   entries: Entry[],
   metric: (es: Entry[]) => number,
 ): ComparativeResult {
-  const ranking = PEOPLE.map((p) => ({
+  const ranking = getPeople().map((p) => ({
     person: p,
     value: metric(entriesFor(entries, p)),
   })).sort((a, b) => b.value - a.value || a.person.localeCompare(b.person));
@@ -372,7 +372,7 @@ const COMPARATIVE: ComparativeAchievement[] = [
     label: "Speed Demon",
     description: "Most drinks in any 1-hour window.",
     evaluate(entries) {
-      const ranking = PEOPLE.map((p) => ({
+      const ranking = getPeople().map((p) => ({
         person: p,
         value: mostInRollingWindow(entries, p, 60 * 60 * 1000).count,
       })).sort(
@@ -396,7 +396,7 @@ const COMPARATIVE: ComparativeAchievement[] = [
     label: "24-Hour Hero",
     description: "Most drinks in any 24-hour window.",
     evaluate(entries) {
-      const ranking = PEOPLE.map((p) => ({
+      const ranking = getPeople().map((p) => ({
         person: p,
         value: mostInRollingWindow(entries, p, 24 * 60 * 60 * 1000).count,
       })).sort(
@@ -420,7 +420,7 @@ const COMPARATIVE: ComparativeAchievement[] = [
     label: "Latest Owl",
     description: "Latest drink ever logged.",
     evaluate(entries) {
-      const ranking = PEOPLE.map((p) => {
+      const ranking = getPeople().map((p) => {
         const es = entriesFor(entries, p);
         let latest = -1;
         for (const e of es) {
@@ -453,7 +453,7 @@ const COMPARATIVE: ComparativeAchievement[] = [
     label: "Earliest Bird",
     description: "Earliest drink of the day.",
     evaluate(entries) {
-      const ranking = PEOPLE.map((p) => {
+      const ranking = getPeople().map((p) => {
         const es = entriesFor(entries, p);
         let earliest = 99;
         for (const e of es) {
@@ -471,7 +471,7 @@ const COMPARATIVE: ComparativeAchievement[] = [
       return {
         winners,
         value: top ?? 0,
-        ranking: ranking.length ? ranking : PEOPLE.map((p) => ({ person: p, value: 0 })),
+        ranking: ranking.length ? ranking : getPeople().map((p) => ({ person: p, value: 0 })),
         formatValue: (v) =>
           v ? `${v.toString().padStart(2, "0")}:00` : "—",
       };
@@ -484,7 +484,7 @@ const COMPARATIVE: ComparativeAchievement[] = [
     label: "Heavy Pour Holder",
     description: "Largest single drink.",
     evaluate(entries) {
-      const ranking = PEOPLE.map((p) => {
+      const ranking = getPeople().map((p) => {
         const largest = largestSinglePour(entriesFor(entries, p));
         return { person: p, value: largest?.ml ?? 0 };
       }).sort(

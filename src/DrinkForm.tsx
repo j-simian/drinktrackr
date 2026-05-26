@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import {
   DRINK_KINDS,
-  PEOPLE,
   type DrinkKind,
   type Entry,
   type Person,
   type QuantityUnit,
 } from "./types";
+import { addPerson, removePerson, usePeople } from "./people";
 
 export interface DrinkFormValues {
   people: Person[];
@@ -81,6 +81,7 @@ interface Props {
   onCancel?: () => void;
   resetOnSubmit?: boolean;
   multiSelectPeople?: boolean;
+  manageable?: boolean;
 }
 
 function emptyValues(): DrinkFormValues {
@@ -123,13 +124,17 @@ export function DrinkForm({
   onCancel,
   resetOnSubmit = false,
   multiSelectPeople = false,
+  manageable = false,
 }: Props) {
+  const people = usePeople();
   const [values, setValues] = useState<DrinkFormValues>(
     initial ? valuesFromEntry(initial) : emptyValues(),
   );
   const [saving, setSaving] = useState(false);
   const [justSaved, setJustSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [editingPeople, setEditingPeople] = useState(false);
+  const [newName, setNewName] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
@@ -160,6 +165,15 @@ export function DrinkForm({
     });
   }
 
+  function handleAddPerson() {
+    if (addPerson(newName)) setNewName("");
+  }
+
+  function handleRemovePerson(p: Person) {
+    removePerson(p);
+    setValues((v) => ({ ...v, people: v.people.filter((x) => x !== p) }));
+  }
+
   async function handleSubmit() {
     if (values.people.length === 0 || saving) return;
     setSaving(true);
@@ -188,21 +202,69 @@ export function DrinkForm({
         Who{multiSelectPeople ? " (tap multiple for a round)" : ""}
       </label>
       <div className="people">
-        {PEOPLE.map((p) => {
+        {people.map((p) => {
           const selected = values.people.includes(p);
           return (
-            <button
-              key={p}
-              type="button"
-              className={`person-btn ${selected ? "selected" : ""}`}
-              aria-pressed={selected}
-              onClick={() => togglePerson(p)}
-            >
-              {p}
-            </button>
+            <div key={p} className="person-slot">
+              <button
+                type="button"
+                className={`person-btn ${selected ? "selected" : ""}`}
+                aria-pressed={selected}
+                onClick={() => togglePerson(p)}
+              >
+                {p}
+              </button>
+              {manageable && editingPeople && (
+                <button
+                  type="button"
+                  className="person-remove"
+                  aria-label={`Remove ${p}`}
+                  onClick={() => handleRemovePerson(p)}
+                >
+                  ×
+                </button>
+              )}
+            </div>
           );
         })}
       </div>
+      {manageable && (
+        <div className="people-edit">
+          <button
+            type="button"
+            className="edit-names-btn"
+            aria-pressed={editingPeople}
+            onClick={() => setEditingPeople((v) => !v)}
+          >
+            {editingPeople ? "Done" : "Edit names"}
+          </button>
+          {editingPeople && (
+            <form
+              className="add-person-row"
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleAddPerson();
+              }}
+            >
+              <input
+                type="text"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                placeholder="Add a name"
+                aria-label="New name"
+                maxLength={20}
+              />
+              <button
+                type="submit"
+                className="add-person-btn"
+                disabled={!newName.trim()}
+              >
+                Add
+              </button>
+            </form>
+          )}
+        </div>
+      )}
 
       <label className="field-label">Photo</label>
       <div className="photo-row">

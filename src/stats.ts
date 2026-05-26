@@ -1,5 +1,5 @@
 import type { DrinkKind, Entry, Person } from "./types";
-import { PEOPLE } from "./types";
+import { getPeople } from "./people";
 import { beersForEntry, drinkDayKey } from "./beerCount";
 
 const ML_PER_PINT = 568;
@@ -34,10 +34,14 @@ export function totalUnits(entries: Entry[]): number {
 
 export function entriesByPerson(entries: Entry[]): Map<Person, Entry[]> {
   const map = new Map<Person, Entry[]>();
-  for (const p of PEOPLE) map.set(p, []);
+  for (const p of getPeople()) map.set(p, []);
   for (const e of entries) {
-    const list = map.get(e.person);
-    if (list) list.push(e);
+    let list = map.get(e.person);
+    if (!list) {
+      list = [];
+      map.set(e.person, list);
+    }
+    list.push(e);
   }
   return map;
 }
@@ -47,7 +51,7 @@ export function countByPerson(
   predicate?: (e: Entry) => boolean,
 ): Map<Person, number> {
   const map = new Map<Person, number>();
-  for (const p of PEOPLE) map.set(p, 0);
+  for (const p of getPeople()) map.set(p, 0);
   for (const e of entries) {
     if (predicate && !predicate(e)) continue;
     map.set(e.person, (map.get(e.person) ?? 0) + 1);
@@ -57,7 +61,7 @@ export function countByPerson(
 
 export function unitsByPerson(entries: Entry[]): Map<Person, number> {
   const map = new Map<Person, number>();
-  for (const p of PEOPLE) map.set(p, 0);
+  for (const p of getPeople()) map.set(p, 0);
   for (const e of entries) {
     map.set(e.person, (map.get(e.person) ?? 0) + unitsForEntry(e));
   }
@@ -108,14 +112,14 @@ export function dailyHistory(entries: Entry[]): DailyRow[] {
       row = {
         key,
         total: 0,
-        byPerson: Object.fromEntries(PEOPLE.map((p) => [p, 0])) as Record<
+        byPerson: Object.fromEntries(getPeople().map((p) => [p, 0])) as Record<
           Person,
           number
         >,
       };
       map.set(key, row);
     }
-    row.byPerson[e.person] += 1;
+    row.byPerson[e.person] = (row.byPerson[e.person] ?? 0) + 1;
     row.total += 1;
   }
   return Array.from(map.values()).sort((a, b) => a.key.localeCompare(b.key));
@@ -300,8 +304,10 @@ export function uniqueSpiritNames(entries: Entry[]): number {
   return set.size;
 }
 
-// Days where all five people logged at least one drink.
+// Days where everyone in the roster logged at least one drink.
 export function daysWithAllFive(entries: Entry[]): string[] {
+  const roster = getPeople();
+  if (roster.length === 0) return [];
   const byDay = new Map<string, Set<Person>>();
   for (const e of entries) {
     const k = drinkDayKey(e.timestamp);
@@ -314,14 +320,16 @@ export function daysWithAllFive(entries: Entry[]): string[] {
   }
   const result: string[] = [];
   for (const [k, set] of byDay) {
-    if (set.size === PEOPLE.length) result.push(k);
+    if (roster.every((p) => set.has(p))) result.push(k);
   }
   return result.sort();
 }
 
-// True if at any moment all 5 people logged the same drink name within
-// a window of `windowMs`.
+// True if at any moment everyone in the roster logged the same drink name
+// within a window of `windowMs`.
 export function roundOfFive(entries: Entry[], windowMs: number): boolean {
+  const roster = getPeople();
+  if (roster.length === 0) return false;
   const byName = new Map<string, Entry[]>();
   for (const e of entries) {
     const key = normaliseName(e.name);
@@ -331,7 +339,7 @@ export function roundOfFive(entries: Entry[], windowMs: number): boolean {
     byName.set(key, list);
   }
   for (const list of byName.values()) {
-    if (list.length < PEOPLE.length) continue;
+    if (list.length < roster.length) continue;
     const sorted = list.slice().sort((a, b) => a.timestamp - b.timestamp);
     let left = 0;
     const peopleInWindow = new Map<Person, number>();
@@ -345,7 +353,7 @@ export function roundOfFive(entries: Entry[], windowMs: number): boolean {
         else peopleInWindow.set(lp, c - 1);
         left++;
       }
-      if (peopleInWindow.size === PEOPLE.length) return true;
+      if (roster.every((rp) => peopleInWindow.has(rp))) return true;
     }
   }
   return false;

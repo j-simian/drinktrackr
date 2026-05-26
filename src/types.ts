@@ -1,15 +1,4 @@
-export const PEOPLE = [
-  "Naman",
-  "Ross",
-  "Duncan",
-  "Chaz",
-  "Kash",
-  "Jess",
-  "Tess",
-  "Emma",
-  "Niamh",
-] as const;
-export type Person = (typeof PEOPLE)[number];
+export type Person = string;
 
 export const DRINK_KINDS = ["beer", "wine", "spirit", "other"] as const;
 export type DrinkKind = (typeof DRINK_KINDS)[number];

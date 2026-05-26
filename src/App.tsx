@@ -93,6 +93,7 @@ export function App() {
           onSubmit={handleCreate}
           resetOnSubmit
           multiSelectPeople
+          manageable
         />
       </section>
 

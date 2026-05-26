@@ -8,7 +8,7 @@ import {
   YAxis,
 } from "recharts";
 import type { Entry, Person } from "./types";
-import { PEOPLE } from "./types";
+import { colorForPerson, usePeople } from "./people";
 import { beersForEntry } from "./beerCount";
 import {
   COMPARATIVE_ACHIEVEMENTS,
@@ -31,18 +31,6 @@ interface Props {
   onClose: () => void;
 }
 
-const PERSON_COLOR: Record<Person, string> = {
-  Naman: "#3b82f6",
-  Ross: "#e5484d",
-  Duncan: "#f5a524",
-  Chaz: "#10b981",
-  Kash: "#f97316",
-  Jess: "#a78bfa",
-  Tess: "#ec4899",
-  Emma: "#06b6d4",
-  Niamh: "#84cc16",
-};
-
 type Filter = "Everyone" | Person;
 
 function formatDayLabel(key: string): string {
@@ -63,6 +51,7 @@ function lastNDays(rows: ReturnType<typeof dailyHistory>, n: number) {
 }
 
 export function StatsPage({ entries, onClose }: Props) {
+  const people = usePeople();
   const [filter, setFilter] = useState<Filter>("Everyone");
 
   useEffect(() => {
@@ -85,7 +74,7 @@ export function StatsPage({ entries, onClose }: Props) {
   }, [filtered]);
 
   const leaderboard = useMemo(() => {
-    return PEOPLE.map((p) => ({
+    return people.map((p) => ({
       person: p,
       total: entries.filter((e) => e.person === p).length,
       beers: entries
@@ -94,7 +83,7 @@ export function StatsPage({ entries, onClose }: Props) {
     })).sort(
       (a, b) => b.total - a.total || a.person.localeCompare(b.person),
     );
-  }, [entries]);
+  }, [entries, people]);
 
   const kindCounts = useMemo(() => countByKind(filtered), [filtered]);
   const kindTotal =
@@ -109,13 +98,13 @@ export function StatsPage({ entries, onClose }: Props) {
         label: formatDayLabel(row.key),
       };
       if (filter === "Everyone") {
-        for (const p of PEOPLE) point[p] = row.byPerson[p];
+        for (const p of people) point[p] = row.byPerson[p] ?? 0;
       } else {
-        point[filter] = row.byPerson[filter];
+        point[filter] = row.byPerson[filter] ?? 0;
       }
       return point;
     });
-  }, [daily, filter]);
+  }, [daily, filter, people]);
 
   const topDrinks = useMemo(() => topDrinkNames(filtered, 5), [filtered]);
 
@@ -150,7 +139,7 @@ export function StatsPage({ entries, onClose }: Props) {
         </div>
 
         <div className="person-filter" role="tablist">
-          {(["Everyone", ...PEOPLE] as Filter[]).map((p) => (
+          {(["Everyone", ...people] as Filter[]).map((p) => (
             <button
               key={p}
               type="button"
@@ -161,8 +150,8 @@ export function StatsPage({ entries, onClose }: Props) {
               style={
                 filter === p && p !== "Everyone"
                   ? {
-                      background: PERSON_COLOR[p],
-                      borderColor: PERSON_COLOR[p],
+                      background: colorForPerson(p),
+                      borderColor: colorForPerson(p),
                       color: "#0a0a0a",
                     }
                   : undefined
@@ -202,7 +191,7 @@ export function StatsPage({ entries, onClose }: Props) {
                         className="leaderboard-fill"
                         style={{
                           width: `${width}%`,
-                          background: PERSON_COLOR[row.person],
+                          background: colorForPerson(row.person),
                         }}
                       />
                     </div>
@@ -283,12 +272,12 @@ export function StatsPage({ entries, onClose }: Props) {
                     }}
                     cursor={{ fill: "rgba(255,255,255,0.05)" }}
                   />
-                  {(filter === "Everyone" ? PEOPLE : [filter]).map((p) => (
+                  {(filter === "Everyone" ? people : [filter]).map((p) => (
                     <Bar
                       key={p}
                       dataKey={p}
                       stackId="a"
-                      fill={PERSON_COLOR[p as Person]}
+                      fill={colorForPerson(p)}
                     />
                   ))}
                 </BarChart>
@@ -410,7 +399,7 @@ export function StatsPage({ entries, onClose }: Props) {
           <div className="personal-achievements">
             {PERSONAL_ACHIEVEMENTS.map((ach) => {
               if (filter === "Everyone") {
-                const unlockedBy = PEOPLE.filter(
+                const unlockedBy = people.filter(
                   (p) => ach.evaluate(entries, p).unlocked,
                 );
                 return (
@@ -423,7 +412,7 @@ export function StatsPage({ entries, onClose }: Props) {
                       <div className="achievement-label">{ach.label}</div>
                       <div className="achievement-desc">{ach.description}</div>
                       <div className="achievement-detail">
-                        {unlockedBy.length}/{PEOPLE.length}
+                        {unlockedBy.length}/{people.length}
                         {unlockedBy.length
                           ? ` · ${unlockedBy.join(", ")}`
                           : ""}
